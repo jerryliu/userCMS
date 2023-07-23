@@ -12,7 +12,6 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_module_1 = require("./modules/users/user.module");
 const graphql_1 = require("@nestjs/graphql");
 const user_entity_1 = require("./modules/users/user.entity");
-const friend_entity_1 = require("./modules/users/friend.entity");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -25,7 +24,7 @@ AppModule = __decorate([
                 username: 'example',
                 password: 'example',
                 database: 'example',
-                entities: [user_entity_1.User, friend_entity_1.Friend],
+                entities: [user_entity_1.User],
                 synchronize: true,
             }),
             graphql_1.GraphQLModule.forRoot({ autoSchemaFile: true }),

@@ -9,4 +9,6 @@ export declare class User {
     friends: User[];
     createdAt: Date;
     updatedAt: Date;
+    hashPassword(): Promise<void>;
+    validatePassword(password: string): Promise<boolean>;
 }

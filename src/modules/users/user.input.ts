@@ -1,23 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Field, Int, ObjectType, InputType } from '@nestjs/graphql';
-import {
-  Length,
-  IsNotEmpty,
-  Matches,
-  IsEmail,
-  IsOptional,
-  IsNumberString,
-} from 'class-validator';
+import { Column } from 'typeorm';
+import { Field, InputType } from '@nestjs/graphql';
+import { Matches, IsEmail, IsOptional, IsNumberString } from 'class-validator';
 
 @InputType()
 export class UserInput {

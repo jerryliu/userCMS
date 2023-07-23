@@ -12,8 +12,16 @@ var User_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
+const bcrypt = require("bcrypt");
 const graphql_1 = require("@nestjs/graphql");
 let User = User_1 = class User {
+    async hashPassword() {
+        const saltRounds = 10;
+        this.password = await bcrypt.hash(this.password, saltRounds);
+    }
+    async validatePassword(password) {
+        return bcrypt.compare(password, this.password);
+    }
 };
 __decorate([
     (0, graphql_1.Field)(() => graphql_1.ID),
@@ -41,7 +49,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)('bytea'),
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "picture", void 0);
@@ -64,6 +72,13 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], User.prototype, "hashPassword", null);
 User = User_1 = __decorate([
     (0, graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)('users')

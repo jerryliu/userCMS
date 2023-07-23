@@ -1,25 +1,19 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Field, ID, ObjectType, InputType } from '@nestjs/graphql';
-// import { Friend } from './friendship.entity';
-import { Friend } from './friend.entity';
-// import { Team } from '../teams/team.model';
-// @ObjectType({ isAbstract: true })
-// @InputType({ isAbstract: true })
+import * as bcrypt from 'bcrypt';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 @Entity('users')
 export class User {
-  //   @PrimaryColumn('varchar', { length: 36 })
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
@@ -40,7 +34,7 @@ export class User {
   @Field({ nullable: true })
   phone?: string;
 
-  @Column({ nullable: true })
+  @Column('bytea')
   @Field({ nullable: true })
   picture?: string;
 
@@ -58,4 +52,15 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    const saltRounds = 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+  }
+
+  async validatePassword(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  }
 }

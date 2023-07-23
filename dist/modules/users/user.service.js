@@ -17,34 +17,28 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./user.entity");
-const await_to_js_1 = require("await-to-js");
+const bcrypt = require("bcrypt");
+const jwt_1 = require("@nestjs/jwt");
 let UserService = class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
-    findAll() {
-        return this.userRepository.find({});
+    async validateUser(email, password) {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (user && (await bcrypt.compare(password, user.password))) {
+            const payload = { username: user.name, id: user.id };
+            return Object.assign(Object.assign({}, user), { token: this.jwtService.sign(payload) });
+        }
+        else {
+            throw new Error('Invalid credentials');
+        }
     }
     findById(id) {
         return this.userRepository.findOne({
             where: { id },
             relations: ['friends'],
         });
-    }
-    async createUser(input) {
-        console.log(input, 'userdata');
-        const user = new user_entity_1.User();
-        user.name = input.name;
-        user.email = input.email;
-        user.password = input === null || input === void 0 ? void 0 : input.password;
-        user.phone = input === null || input === void 0 ? void 0 : input.phone;
-        user.picture = input === null || input === void 0 ? void 0 : input.picture;
-        user.company = input === null || input === void 0 ? void 0 : input.company;
-        const [err, data] = await (0, await_to_js_1.default)(this.userRepository.save(user));
-        if (err)
-            throw new common_1.BadRequestException(err.message);
-        return data;
-        return user;
     }
     findByIds(ids) {
         return this.userRepository.find({
@@ -55,7 +49,8 @@ let UserService = class UserService {
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        jwt_1.JwtService])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

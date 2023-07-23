@@ -9,19 +9,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const jwt_1 = require("@nestjs/jwt");
 const user_entity_1 = require("./user.entity");
-const friend_entity_1 = require("./friend.entity");
 const user_service_1 = require("./user.service");
-const user_controller_1 = require("./user.controller");
 const user_resolver_1 = require("./user.resolver");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, friend_entity_1.Friend])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
+            jwt_1.JwtModule.register({
+                secret: 'topSecret51',
+                signOptions: { expiresIn: '180m' },
+            }),
+        ],
         providers: [user_service_1.UserService, user_resolver_1.UserResolver],
         exports: [user_service_1.UserService],
-        controllers: [user_controller_1.UserController],
     })
 ], UserModule);
 exports.UserModule = UserModule;

@@ -17,13 +17,11 @@ const graphql_1 = require("@nestjs/graphql");
 const user_entity_1 = require("./user.entity");
 const user_input_1 = require("./user.input");
 const user_service_1 = require("./user.service");
-const friend_entity_1 = require("./friend.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 let UserResolver = class UserResolver {
-    constructor(usersRepository, friendsRepository, userService) {
+    constructor(usersRepository, userService) {
         this.usersRepository = usersRepository;
-        this.friendsRepository = friendsRepository;
         this.userService = userService;
     }
     async users() {
@@ -38,9 +36,11 @@ let UserResolver = class UserResolver {
                 id: (0, typeorm_2.In)(input.friendIds),
             })
             : [];
-        console.log(friends);
         const user = this.usersRepository.create(Object.assign(Object.assign({}, input), { friends }));
         return this.usersRepository.save(user);
+    }
+    async login(email, password) {
+        return await this.userService.validateUser(email, password);
     }
 };
 __decorate([
@@ -63,12 +63,18 @@ __decorate([
     __metadata("design:paramtypes", [user_input_1.UserInput]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "createUser", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => user_entity_1.User),
+    __param(0, (0, graphql_1.Args)('email')),
+    __param(1, (0, graphql_1.Args)('password')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "login", null);
 UserResolver = __decorate([
     (0, graphql_1.Resolver)(() => user_entity_1.User),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(1, (0, typeorm_1.InjectRepository)(friend_entity_1.Friend)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository,
         user_service_1.UserService])
 ], UserResolver);
 exports.UserResolver = UserResolver;

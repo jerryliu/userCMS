@@ -1,17 +1,19 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 import { User } from './user.entity';
-// import { Friendship } from './friendship.entity';
-import { Friend } from './friend.entity';
 import { UserService } from './user.service';
-import { UserController } from './user.controller';
 import { UserResolver } from './user.resolver';
-// import { TeamModule } from '../teams/team.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Friend])],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    JwtModule.register({
+      secret: 'topSecret51', // Replace this with your own secret
+      signOptions: { expiresIn: '180m' }, // Configure token expiration if needed
+    }),
+  ],
   providers: [UserService, UserResolver],
-  exports: [UserService],
-  controllers: [UserController],
+  exports: [UserService], // Export the service if it will be used outside of this module
 })
 export class UserModule {}
