@@ -21,8 +21,13 @@ export class UserService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload = { username: user.name, id: user.id };
+
+      // Convert picture to base64 string
+      console.log(user.picture);
+      const base64Image = Buffer.from(user.picture, 'base64');
       return {
         ...user,
+        picture: base64Image, // replace the original picture data with the base64 string
         token: this.jwtService.sign(payload),
       };
     } else {

@@ -55,7 +55,6 @@ const LoginPage = () => {
 
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data), 'response.data');
         setUser(response.data);
         navigate('/userinfo');
       })

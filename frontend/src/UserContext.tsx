@@ -7,7 +7,7 @@ export type User = {
   email: string;
   phone: string;
   company: string;
-  picture: string;
+  picture: any;
 } | null;
 
 type UserContextType = {
