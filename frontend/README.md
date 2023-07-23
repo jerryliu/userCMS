@@ -2,7 +2,7 @@
 
 ## React.js:
 
-- Popular, performant, and component-based frontend framework.
+- Popular, performant, and functional base components frontend framework.
 - Offers a seamless and responsive user experience.
 
 ## Ant Design:

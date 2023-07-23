@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import { LikeOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
-import { Descriptions, Table, Col, Row, Statistic } from 'antd';
+import { Table, Col, Row, Statistic } from 'antd';
 import UserContext from './UserContext';
 import './midPage.css';
 
@@ -35,7 +36,8 @@ type Friend = {
 };
 
 const UserInfoPage = () => {
-  console.log(useContext(UserContext), 'dddddd');
+  const { id } = useParams();
+  console.log(id, 'iiiiii');
   const context = useContext(UserContext);
 
   if (!context) {
@@ -46,9 +48,42 @@ const UserInfoPage = () => {
   const { user } = context;
 
   if (!user) {
-    return <p>No user logged in</p>;
+    var data = JSON.stringify({
+      query: `query getUser($id:Int!){
+  user(id:$id){
+    id
+    name
+    picture
+    friends{
+      name
+      email
+      phone
+      company
+    }
   }
-  const dataSource = user.data.login.friends.map(
+}`,
+      variables: { id: id },
+    });
+
+    var config = {
+      method: 'post',
+      url: 'http://localhost:3000/graphql',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
+
+    axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const dataSource = user?.data.login.friends.map(
     (friend: Friend, index: number) => ({
       key: index, // generate a unique key
       name: friend.name,
@@ -64,24 +99,24 @@ const UserInfoPage = () => {
         <Col span={3}>
           <Statistic
             title="Name"
-            value={user.data.login.name}
+            value={user?.data.login.name}
             // prefix={<LikeOutlined />}
           />
         </Col>
         <Col span={3}>
-          <Statistic title="Email" value={user.data.login.email} />
+          <Statistic title="Email" value={user?.data.login.email} />
         </Col>
         <Col span={3}>
-          <Statistic title="Phone" value={user.data.login.phone} />
+          <Statistic title="Phone" value={user?.data.login.phone} />
         </Col>
         <Col span={3}>
-          <Statistic title="Company" value={user.data.login.company} />
+          <Statistic title="Company" value={user?.data.login.company} />
         </Col>
         <Col span={3}>
           <p>Picture</p>
           <img
-            src={user.data.login.picture}
-            alt={user.name}
+            src={user?.data.login.picture}
+            alt={user?.name}
             style={{ width: '50px', height: '50px' }}
           />
         </Col>

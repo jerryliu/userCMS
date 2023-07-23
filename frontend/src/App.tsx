@@ -16,7 +16,7 @@ export const App = () => {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/userinfo" element={<UserInfoPage />} />
+          <Route path="/userinfo/:id" element={<UserInfoPage />} />
         </Routes>
       </Router>
     </UserProvider>

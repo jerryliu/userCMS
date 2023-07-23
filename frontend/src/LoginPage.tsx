@@ -26,8 +26,6 @@ const LoginPage = () => {
   }
 
   const { setUser } = context;
-
-  // const [user, setUser] = useState(null);
   const onFinish = async (values: LoginFormValues) => {
     var data = JSON.stringify({
       query: `mutation Login ($email: String!, $password: String!){
@@ -63,7 +61,7 @@ const LoginPage = () => {
       .then(function (response) {
         if (response.data.data !== null) {
           setUser(response.data);
-          navigate('/userinfo');
+          navigate(`/userinfo/${response.data.data.login.id}`);
         } else {
           setError(
             'Login failed. Please check your credentials and try again.'
