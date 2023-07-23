@@ -34,7 +34,7 @@ export class User {
   @Field({ nullable: true })
   phone?: string;
 
-  @Column('bytea')
+  @Column('text')
   @Field({ nullable: true })
   picture?: string;
 

@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import UserContext from './UserContext'; // Make sure to import UserContext
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, Alert } from 'antd';
 import axios from 'axios';
 import './midPage.css';
 interface LoginFormValues {
@@ -18,7 +18,7 @@ interface RegistFormValues {
 }
 const LoginPage = () => {
   const navigate = useNavigate();
-
+  const [error, setError] = useState<string | null>(null);
   const context = useContext(UserContext);
   if (!context) {
     // handle this situation differently, such as return null or throw an error
@@ -55,8 +55,14 @@ const LoginPage = () => {
 
     axios(config)
       .then(function (response) {
-        setUser(response.data);
-        navigate('/userinfo');
+        if (response.data.data !== null) {
+          setUser(response.data);
+          navigate('/userinfo');
+        } else {
+          setError(
+            'Login failed. Please check your credentials and try again.'
+          );
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -71,6 +77,16 @@ const LoginPage = () => {
         initialValues={{ remember: true }}
         onFinish={onFinish}
       >
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            closable
+            onClose={() => setError(null)}
+          />
+        )}
+
         <Form.Item
           name="email"
           rules={[{ required: true, message: 'Please input your Email!' }]}
