@@ -1,19 +1,26 @@
 // App.js
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { UserProvider, User } from './UserContext';
+
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
-import { UserPage } from './UserPage';
+import UserInfoPage from './UserInfoPage';
 
 export const App = () => {
-  const userId = '123'; // replace this with the real user id
+  const [user, setUser] = useState<User>(null);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/user" element={<UserPage userId={userId} />} />
-      </Routes>
-    </Router>
+    <UserProvider value={{ user, setUser }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/userinfo" element={<UserInfoPage />} />
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 };
+
+// export default App;

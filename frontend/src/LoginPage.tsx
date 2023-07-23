@@ -1,3 +1,6 @@
+import React, { useContext } from 'react';
+import UserContext from './UserContext'; // Make sure to import UserContext
+import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
 import axios from 'axios';
 import './midPage.css';
@@ -5,15 +8,37 @@ interface LoginFormValues {
   email: string;
   password: string;
 }
-
+interface RegistFormValues {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  picture: string;
+  company: string;
+}
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  const context = useContext(UserContext);
+  if (!context) {
+    // handle this situation differently, such as return null or throw an error
+    return null;
+  }
+
+  const { setUser } = context;
+
+  // const [user, setUser] = useState(null);
   const onFinish = async (values: LoginFormValues) => {
     var data = JSON.stringify({
       query: `mutation Login ($email: String!, $password: String!){
         login(password:$password, email: $email) {
-                name
-                id
-                email
+                
+              id
+              name
+              email
+              phone
+              company
+              picture
             }
         }`,
       variables: { email: values.email, password: values.password },
@@ -30,7 +55,9 @@ const LoginPage = () => {
 
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        console.log(JSON.stringify(response.data), 'response.data');
+        setUser(response.data);
+        navigate('/userinfo');
       })
       .catch(function (error) {
         console.log(error);
