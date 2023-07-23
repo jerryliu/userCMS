@@ -39,6 +39,12 @@ const LoginPage = () => {
               phone
               company
               picture
+                friends{
+                  name
+                  phone
+                  email
+                  company
+                }
             }
         }`,
       variables: { email: values.email, password: values.password },

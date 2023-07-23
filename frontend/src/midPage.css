@@ -13,3 +13,11 @@
 .login-form-button {
   width: 100%;
 }
+.info-list {
+  margin: 6px;
+  border: 1px solid #333;
+}
+
+.info-list legend {
+  padding: 0 10px;
+}
