@@ -1,89 +1,30 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useParams } from 'react-router-dom';
-
-import { Table, Col, Row, Statistic } from 'antd';
-import UserContext from './UserContext';
+import { columns } from './columns';
+import { Table, Col, Row, Statistic, Button } from 'antd';
 import './midPage.css';
-
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Phone',
-    dataIndex: 'phone',
-    key: 'phone',
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-    key: 'email',
-  },
-  {
-    title: 'Company',
-    dataIndex: 'company',
-    key: 'company',
-  },
-];
 type Friend = {
   name: string;
   phone: string;
   email: string;
   company: string | null;
 };
-
+type UserDataType = {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  picture: string;
+  friends: Friend[];
+};
 const UserInfoPage = () => {
-  const { id } = useParams();
-  console.log(id, 'iiiiii');
-  const context = useContext(UserContext);
-
-  if (!context) {
-    // handle this situation differently, such as return null or throw an error
-    return null;
-  }
-
-  const { user } = context;
-
-  if (!user) {
-    var data = JSON.stringify({
-      query: `query getUser($id:Int!){
-  user(id:$id){
-    id
-    name
-    picture
-    friends{
-      name
-      email
-      phone
-      company
-    }
-  }
-}`,
-      variables: { id: id },
-    });
-
-    var config = {
-      method: 'post',
-      url: 'http://localhost:3000/graphql',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    };
-
-    axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-
-  const dataSource = user?.data.login.friends.map(
+  const { id } = useParams(); // get the id from the URL
+  const [userData, setUserData] = useState<UserDataType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false); // Initialize isOwner state to false
+  const dataSource = userData?.friends?.map(
     (friend: Friend, index: number) => ({
       key: index, // generate a unique key
       name: friend.name,
@@ -92,37 +33,113 @@ const UserInfoPage = () => {
       company: friend.company,
     })
   );
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const cookieData = Cookies.get('userData'); // replace 'user' with the key you used to store the user data in the cookie
+        const user = cookieData ? JSON.parse(cookieData) : null;
+        if (user && user.id === id) {
+          // isOwner = true;
+          setIsOwner(true);
+          console.log(isOwner, 'is owner');
+
+          setUserData(user);
+        } else {
+          // setOwner(false);
+          // User is not owner
+          var data = JSON.stringify({
+            query: `query getUser($id:Int!){
+                      user(id:$id){
+                        name
+                        email
+                        phone
+                        company
+                        picture
+                        
+                      }
+                    }`,
+            variables: { id: Number(id) },
+          });
+
+          var config = {
+            method: 'post',
+            url: 'http://localhost:3000/graphql',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            data: data,
+          };
+
+          axios(config)
+            .then(function (response) {
+              console.log(JSON.stringify(response.data.data.user), 'aaa');
+
+              setUserData(response.data.data.user);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [id]);
+  const addFriend = async () => {
+    try {
+      const response = await axios.post('http://your-api-url', {});
+
+      // Handle the response here...
+      console.log(response.data);
+    } catch (error) {
+      // Handle the error here...
+      console.error('An error occurred while adding the friend:', error);
+    }
+  };
+  if (loading) return <div>Loading...</div>;
+
   return (
     <fieldset className="infor-list">
-      <h2>Your Information</h2>
+      <h2>
+        {isOwner ? 'Your Information' : `${userData?.name}'s Information`}
+      </h2>
       <Row gutter={16} title="User Information">
         <Col span={3}>
-          <Statistic
-            title="Name"
-            value={user?.data.login.name}
-            // prefix={<LikeOutlined />}
-          />
+          <Statistic title="Name" value={userData?.name || ''} />
         </Col>
         <Col span={3}>
-          <Statistic title="Email" value={user?.data.login.email} />
+          <Statistic title="Email" value={userData?.email || ''} />
         </Col>
         <Col span={3}>
-          <Statistic title="Phone" value={user?.data.login.phone} />
+          <Statistic title="Phone" value={userData?.phone || ''} />
         </Col>
         <Col span={3}>
-          <Statistic title="Company" value={user?.data.login.company} />
+          <Statistic title="Company" value={userData?.company || ''} />
         </Col>
         <Col span={3}>
           <p>Picture</p>
           <img
-            src={user?.data.login.picture}
-            alt={user?.name}
+            src={userData?.picture}
+            alt={userData?.name}
             style={{ width: '50px', height: '50px' }}
           />
         </Col>
       </Row>
-      <h2>Your Friend List</h2>
-      <Table dataSource={dataSource} columns={columns} />
+      {isOwner ? (
+        <>
+          <h1>Your Friends List</h1>
+          <Table dataSource={dataSource || []} columns={columns} />
+        </>
+      ) : (
+        <Button type="primary" onClick={addFriend}>
+          Add Friend
+        </Button>
+      )}
     </fieldset>
   );
 };

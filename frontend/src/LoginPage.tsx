@@ -3,6 +3,8 @@ import UserContext from './UserContext'; // Make sure to import UserContext
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Alert } from 'antd';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+
 import './midPage.css';
 interface LoginFormValues {
   email: string;
@@ -61,6 +63,8 @@ const LoginPage = () => {
       .then(function (response) {
         if (response.data.data !== null) {
           setUser(response.data);
+          Cookies.set('userData', JSON.stringify(response.data.data.login));
+
           navigate(`/userinfo/${response.data.data.login.id}`);
         } else {
           setError(
