@@ -13,29 +13,26 @@ export class UserResolver {
     private readonly userService: UserService
   ) {}
   @Query(() => [User])
-  async users() {
+  users() {
     return this.usersRepository.find({ relations: ['friends'] });
   }
 
   @Query((returns) => User, { name: 'user', nullable: true })
-  async getUserById(@Args({ name: 'id', type: () => Int }) id: number) {
+  getUserById(@Args({ name: 'id', type: () => Int }) id: number) {
     return this.userService.findById(id);
   }
   @Mutation(() => User)
-  async createUser(@Args('data') data: UserInput) {
-    return await this.userService.createUser(data);
+  createUser(@Args('data') data: UserInput) {
+    return this.userService.createUser(data);
   }
 
   @Mutation(() => User)
-  async login(
-    @Args('email') email: string,
-    @Args('password') password: string
-  ) {
-    return await this.userService.validateUser(email, password);
+  login(@Args('email') email: string, @Args('password') password: string) {
+    return this.userService.validateUser(email, password);
   }
 
   @Mutation(() => User)
-  async addFriend(@Args('data') data: AddFriendInput): Promise<User | null> {
-    return await this.userService.addFriend(data);
+  addFriend(@Args('data') data: AddFriendInput): Promise<User | null> {
+    return this.userService.addFriend(data);
   }
 }

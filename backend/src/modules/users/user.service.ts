@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -32,7 +36,7 @@ export class UserService {
         token: this.jwtService.sign(payload),
       };
     } else {
-      throw new Error('Invalid credentials');
+      throw new BadRequestException('Invalid credentials');
     }
   }
 
@@ -47,7 +51,8 @@ export class UserService {
       friends,
     });
     const [err, user] = await to(this.userRepository.save(newUser));
-    if (err) throw new Error('There was an error saving the user');
+    if (err)
+      throw new BadRequestException('There was an error saving the user');
 
     return this.userRepository.save(user);
   }
@@ -62,8 +67,12 @@ export class UserService {
       })
     );
 
-    if (userErr) throw new Error('There was an error while finding the user');
-    if (!user) throw new Error('User not found');
+    if (userErr) {
+      throw new BadRequestException(
+        'There was an error while finding the user'
+      );
+    }
+    if (!user) throw new NotFoundException('User not found');
 
     // get the friend from database
     const [friendErr, friend] = await to(
@@ -71,17 +80,24 @@ export class UserService {
         where: { id: data.friendId },
       })
     );
-    if (friendErr) throw new Error('There was an error while finding the user');
-    if (!friend) throw new Error('Friend not found');
+    if (friendErr) {
+      throw new BadRequestException(
+        'There was an error while finding the friend'
+      );
+    }
+    if (!friend) throw new NotFoundException('Friend not found');
 
     // check if this friend already exists in user's friends list
-    if (user.friends.some((existingFriend) => existingFriend.id == friend.id))
-      throw new Error('This user is already a friend');
+    if (user.friends.some((existingFriend) => existingFriend.id == friend.id)) {
+      throw new BadRequestException('This user is already a friend');
+    }
 
     user.friends = [...user.friends, friend];
     // // save updated user
     const [saveErr, savedUser] = await to(this.userRepository.save(user));
-    if (saveErr) throw new Error('There was an error while saving the user');
+    if (saveErr) {
+      throw new BadRequestException('There was an error while saving the user');
+    }
 
     return savedUser;
   }
@@ -93,8 +109,11 @@ export class UserService {
         relations: ['friends'],
       })
     );
-    if (err) throw new Error('There was an error while finding the user');
-    if (!user) throw new Error('User not found');
+    if (err)
+      throw new BadRequestException(
+        'There was an error while finding the user'
+      );
+    if (!user) throw new NotFoundException('User not found');
 
     return user;
   }
