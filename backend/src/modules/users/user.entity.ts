@@ -26,7 +26,7 @@ export class User {
   @Field({ nullable: false })
   email: string;
 
-  @Column({ type: 'text', nullable: false, select: false }) //It is select as false
+  @Column()
   @Field({ nullable: false })
   password: string;
 
