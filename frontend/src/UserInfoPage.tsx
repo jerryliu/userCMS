@@ -27,6 +27,9 @@ const UserInfoPage = () => {
   const [userPicture, setUserPicture] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false); // Initialize isOwner state to false
+  const defaultPicture =
+    'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50';
+
   const dataSource = userData?.friends?.map(
     (friend: Friend, index: number) => ({
       key: index, // generate a unique key
@@ -44,6 +47,7 @@ const UserInfoPage = () => {
         const cookiePicture = Cookies.get('userPicture');
         const user = cookieData ? JSON.parse(cookieData) : null;
         console.log('current user id', user);
+        console.log('cookiePicture', cookiePicture);
         if (user && user.id === id) {
           setIsOwner(true);
           setUserData(user);
@@ -76,6 +80,7 @@ const UserInfoPage = () => {
           axios(config)
             .then(function (response) {
               setUserData(response.data.data.user);
+              setUserPicture(response.data.data.user.picture || '');
             })
             .catch(function (error) {
               console.log(error);
@@ -144,7 +149,11 @@ const UserInfoPage = () => {
         </Col>
         <Col span={3}>
           <p>Picture</p>
-          <Avatar src={userPicture || ''} size={64} icon={<UserOutlined />} />
+          <Avatar
+            src={userPicture || defaultPicture}
+            size={64}
+            icon={<UserOutlined />}
+          />
         </Col>
       </Row>
       {isOwner ? (
