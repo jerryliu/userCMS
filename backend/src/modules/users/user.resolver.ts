@@ -1,9 +1,10 @@
 import { Int, Args, Query, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from './user.entity';
-import { UserInput, AddFriendInput } from './user.input';
+import { UserInput } from './user.input';
+import { AddFriendInput } from './addFriend.input';
 import { UserService } from './user.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Resolver(() => User)
 export class UserResolver {

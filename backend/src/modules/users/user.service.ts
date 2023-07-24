@@ -8,7 +8,9 @@ import { In, Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AddFriendInput, UserInput } from './user.input';
+import { UserInput } from './user.input';
+import { AddFriendInput } from './addFriend.input';
+
 import to from 'await-to-js';
 
 export interface UserWithToken extends User {

@@ -26,20 +26,20 @@ export class User {
   @Field({ nullable: false })
   email: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: false, select: false }) //It is select as false
   @Field({ nullable: false })
   password: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column({ nullable: false })
+  @Field({ nullable: false })
   phone?: string;
 
   @Column('text')
   @Field({ nullable: true })
   picture?: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column({ nullable: false })
+  @Field({ nullable: false })
   company?: string;
 
   @Field(() => [User], { nullable: true })

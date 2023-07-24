@@ -1,42 +1,44 @@
-import { Column } from 'typeorm';
 import { Field, InputType, ID } from '@nestjs/graphql';
-import { Matches, IsEmail, IsOptional, IsNumberString } from 'class-validator';
+import {
+  Matches,
+  IsEmail,
+  IsOptional,
+  IsNumberString,
+  IsNumber,
+  MinLength,
+  ArrayNotEmpty,
+  IsArray,
+} from 'class-validator';
 
 @InputType()
 export class UserInput {
-  @Field({ nullable: false })
+  @Field()
   @Matches(/^[a-zA-Z0-9_-]{3,15}$/)
   name: string;
 
-  @Field({ nullable: false })
+  @Field()
   @IsEmail()
   email: string;
 
-  @Field({ nullable: false })
+  @Field()
+  @MinLength(6) // at least 8 characters
   password: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsOptional()
   @IsNumberString()
-  phone?: string;
+  phone: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Field()
   picture: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsOptional()
-  company?: string;
+  company: string;
 
-  @Field(() => [Number], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  friendIds: number[];
-}
-@InputType()
-export class AddFriendInput {
-  @Field((type) => ID)
-  userId: number;
-
-  @Field((type) => ID)
-  friendId: number;
+  @IsArray()
+  @IsNumber({}, { each: true }) // ensures each item is a number
+  friendIds?: number[];
 }
