@@ -1,5 +1,4 @@
-import { useContext, useState } from 'react';
-import UserContext from './UserContext'; // Make sure to import UserContext
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Alert } from 'antd';
 import axios from 'axios';
@@ -10,24 +9,10 @@ interface LoginFormValues {
   email: string;
   password: string;
 }
-interface RegistFormValues {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  picture: string;
-  company: string;
-}
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const context = useContext(UserContext);
-  if (!context) {
-    // handle this situation differently, such as return null or throw an error
-    return null;
-  }
 
-  const { setUser } = context;
   const onFinish = async (values: LoginFormValues) => {
     var data = JSON.stringify({
       query: `mutation Login ($email: String!, $password: String!){
@@ -62,9 +47,8 @@ const LoginPage = () => {
     axios(config)
       .then(function (response) {
         if (response.data.data !== null) {
-          setUser(response.data);
+          Cookies.remove('userData');
           Cookies.set('userData', JSON.stringify(response.data.data.login));
-
           navigate(`/userinfo/${response.data.data.login.id}`);
         } else {
           setError(

@@ -15,7 +15,7 @@ interface RegistFormValues {
 
 const RegisterPage = () => {
   const [renderCount, setRenderCount] = useState(0);
-  const [fileList, setFileList] = useState([]);
+  // const [fileList, setFileList] = useState([]);
   const [base64String, setBase64String] = useState('');
   useEffect(() => {
     setRenderCount((count) => count + 1);
@@ -85,9 +85,7 @@ const RegisterPage = () => {
     return false;
   };
 
-  function normFile(...args: any) {
-    throw new Error('Function not implemented.');
-  }
+  function normFile() {}
 
   return (
     <div className="App">
