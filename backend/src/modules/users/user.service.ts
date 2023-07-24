@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AddFriendInput, UserInput } from './user.input';
+import to from 'await-to-js';
 
 export interface UserWithToken extends User {
   token: string;
@@ -41,29 +42,44 @@ export class UserService {
           id: In(data.friendIds),
         })
       : [];
-    const user = this.userRepository.create({
+    const newUser = this.userRepository.create({
       ...data,
       friends,
     });
+    const [err, user] = await to(this.userRepository.save(newUser));
+    if (err) {
+      throw new Error('There was an error saving the user');
+    }
     return this.userRepository.save(user);
   }
 
   async addFriend(data: AddFriendInput) {
-    let user = await this.userRepository.findOne({
-      where: {
-        id: data.userId,
-      },
-      relations: ['friends'],
-    });
+    const [userErr, user] = await to(
+      this.userRepository.findOne({
+        where: {
+          id: data.userId,
+        },
+        relations: ['friends'],
+      })
+    );
+
+    if (userErr) {
+      throw new Error('There was an error while finding the user');
+    }
 
     if (!user) {
       throw new Error('User not found');
     }
 
     // get the friend from database
-    let friend = await this.userRepository.findOne({
-      where: { id: data.friendId },
-    });
+    const [friendErr, friend] = await to(
+      this.userRepository.findOne({
+        where: { id: data.friendId },
+      })
+    );
+    if (friendErr) {
+      throw new Error('There was an error while finding the user');
+    }
     if (!friend) {
       throw new Error('Friend not found');
     }
@@ -75,9 +91,11 @@ export class UserService {
 
     user.friends = [...user.friends, friend];
     // // save updated user
-    user = await this.userRepository.save(user);
-
-    return user;
+    const [saveErr, savedUser] = await to(this.userRepository.save(user));
+    if (saveErr) {
+      throw new Error('There was an error while saving the user');
+    }
+    return savedUser;
   }
   findById(id: number) {
     return this.userRepository.findOne({
