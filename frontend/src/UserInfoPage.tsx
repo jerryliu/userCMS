@@ -86,10 +86,31 @@ const UserInfoPage = () => {
   }, [id]);
   const addFriend = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/graphql', {});
+      var data = JSON.stringify({
+        query: `mutation addFriend($userId:ID!, $friendId:ID!){
+                  addFriend(data:{userId:$userId, friendId:$friendId}){
+                    name
+                  }
+                }`,
+        variables: { userId: 4, friendId: 6 },
+      });
 
-      // Handle the response here...
-      console.log(response.data);
+      var config = {
+        method: 'post',
+        url: 'http://localhost:3000/graphql',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     } catch (error) {
       // Handle the error here...
       console.error('An error occurred while adding the friend:', error);

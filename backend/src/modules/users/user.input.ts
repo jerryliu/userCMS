@@ -1,5 +1,5 @@
 import { Column } from 'typeorm';
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, ID } from '@nestjs/graphql';
 import { Matches, IsEmail, IsOptional, IsNumberString } from 'class-validator';
 
 @InputType()
@@ -31,4 +31,12 @@ export class UserInput {
   @Field(() => [Number], { nullable: true })
   @IsOptional()
   friendIds: number[];
+}
+@InputType()
+export class AddFriendInput {
+  @Field((type) => ID)
+  userId: number;
+
+  @Field((type) => ID)
+  friendId: number;
 }

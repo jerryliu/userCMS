@@ -40,10 +40,4 @@ export class UserService {
       relations: ['friends'],
     });
   }
-
-  findByIds(ids: number[]) {
-    return this.userRepository.find({
-      where: { id: In(ids) },
-    });
-  }
 }
