@@ -40,10 +40,7 @@ const UserInfoPage = () => {
         const cookieData = Cookies.get('userData'); // replace 'user' with the key you used to store the user data in the cookie
         const user = cookieData ? JSON.parse(cookieData) : null;
         if (user && user.id === id) {
-          // isOwner = true;
           setIsOwner(true);
-          console.log(isOwner, 'is owner');
-
           setUserData(user);
         } else {
           // setOwner(false);
@@ -70,11 +67,8 @@ const UserInfoPage = () => {
             },
             data: data,
           };
-
           axios(config)
             .then(function (response) {
-              console.log(JSON.stringify(response.data.data.user), 'aaa');
-
               setUserData(response.data.data.user);
             })
             .catch(function (error) {
@@ -92,7 +86,7 @@ const UserInfoPage = () => {
   }, [id]);
   const addFriend = async () => {
     try {
-      const response = await axios.post('http://your-api-url', {});
+      const response = await axios.post('http://localhost:3000/graphql', {});
 
       // Handle the response here...
       console.log(response.data);

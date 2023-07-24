@@ -22,7 +22,6 @@ const RegisterPage = () => {
   }, []);
 
   const onFinish = async (values: RegistFormValues) => {
-    console.log(base64String, 'base64 string');
     values.picture = base64String;
     var data = JSON.stringify({
       query: `mutation CreateUser($name: String!, $password: String!, $email:String!, $phone:String!, $picture:String!, $company:String!){
