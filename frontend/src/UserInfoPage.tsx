@@ -3,7 +3,9 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useParams } from 'react-router-dom';
 import { columns } from './columns';
-import { Table, Col, Row, Statistic, Button } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+
+import { Table, Col, Row, Statistic, Button, Avatar } from 'antd';
 import './midPage.css';
 type Friend = {
   name: string;
@@ -22,6 +24,7 @@ type UserDataType = {
 const UserInfoPage = () => {
   const { id } = useParams(); // get the id from the URL
   const [userData, setUserData] = useState<UserDataType | null>(null);
+  const [userPicture, setUserPicture] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false); // Initialize isOwner state to false
   const dataSource = userData?.friends?.map(
@@ -37,11 +40,14 @@ const UserInfoPage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const cookieData = Cookies.get('userData'); // replace 'user' with the key you used to store the user data in the cookie
+        const cookieData = Cookies.get('userData');
+        const cookiePicture = Cookies.get('userPicture');
         const user = cookieData ? JSON.parse(cookieData) : null;
+        console.log('current user id', user);
         if (user && user.id === id) {
           setIsOwner(true);
           setUserData(user);
+          setUserPicture(cookiePicture || '');
         } else {
           // setOwner(false);
           // User is not owner
@@ -138,11 +144,7 @@ const UserInfoPage = () => {
         </Col>
         <Col span={3}>
           <p>Picture</p>
-          <img
-            src={userData?.picture}
-            alt={userData?.name}
-            style={{ width: '50px', height: '50px' }}
-          />
+          <Avatar src={userPicture || ''} size={64} icon={<UserOutlined />} />
         </Col>
       </Row>
       {isOwner ? (

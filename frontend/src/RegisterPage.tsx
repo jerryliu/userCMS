@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Form, Input, Button, Upload } from 'antd';
+import { Form, Input, Button, Upload, Alert } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import './midPage.css';
 interface RegistFormValues {
@@ -12,10 +12,15 @@ interface RegistFormValues {
   picture: string;
   company: string;
 }
-
+interface UploadChangeEvent {
+  file: {
+    size: number;
+  };
+}
 const RegisterPage = () => {
   const [renderCount, setRenderCount] = useState(0);
-  // const [fileList, setFileList] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [base64String, setBase64String] = useState('');
   useEffect(() => {
     setRenderCount((count) => count + 1);
@@ -59,20 +64,28 @@ const RegisterPage = () => {
 
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        console.log(response.data, 'aa');
+        if (response.data.errors == null) {
+          navigate('/');
+        } else {
+          console.log(response.data.errors);
+          setError(response.data.errors[0].message);
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
   };
-
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
 
   const beforeUpload = (file: File) => {
     const reader = new FileReader();
-
     reader.onloadend = () => {
       if (typeof reader.result === 'string') {
         setBase64String(reader.result);
@@ -90,11 +103,22 @@ const RegisterPage = () => {
   return (
     <div className="App">
       <Form
+        {...layout}
         name="register"
-        className="register-form"
+        // className="register-form"
+        style={{ maxWidth: 600 }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            closable
+            onClose={() => setError(null)}
+          />
+        )}
         <Form.Item
           label="Name"
           name="name"
@@ -107,7 +131,6 @@ const RegisterPage = () => {
         >
           <Input />
         </Form.Item>
-
         <Form.Item
           label="Email"
           name="email"
@@ -134,9 +157,8 @@ const RegisterPage = () => {
             },
           ]}
         >
-          <Input />
+          <Input.Password />
         </Form.Item>
-
         <Form.Item
           label="Phone"
           name="phone"
@@ -149,7 +171,6 @@ const RegisterPage = () => {
         >
           <Input />
         </Form.Item>
-
         <Form.Item
           label="Company"
           name="company"
@@ -162,7 +183,6 @@ const RegisterPage = () => {
         >
           <Input />
         </Form.Item>
-
         <Form.Item
           label="Profile Picture"
           name="picture"
@@ -176,11 +196,16 @@ const RegisterPage = () => {
             },
           ]}
         >
-          <Upload name="logo" listType="picture" beforeUpload={beforeUpload}>
+          <Upload
+            name="logo"
+            listType="picture"
+            beforeUpload={beforeUpload}
+            // onChange={handleChange}
+            maxCount={1}
+          >
             <Button icon={<UploadOutlined />}>Click to upload</Button>
           </Upload>
         </Form.Item>
-
         <Form.Item>
           <Button
             type="primary"

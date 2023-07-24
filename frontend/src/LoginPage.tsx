@@ -48,7 +48,13 @@ const LoginPage = () => {
       .then(function (response) {
         if (response.data.data !== null) {
           Cookies.remove('userData');
-          Cookies.set('userData', JSON.stringify(response.data.data.login));
+          Cookies.remove('userPicture');
+
+          let userDataWithoutPicture = { ...response.data.data.login };
+          delete userDataWithoutPicture.picture;
+          Cookies.set('userData', JSON.stringify(userDataWithoutPicture));
+          // Save the user's picture in another cookie
+          Cookies.set('userPicture', response.data.data.login.picture);
           navigate(`/userinfo/${response.data.data.login.id}`);
         } else {
           setError(
