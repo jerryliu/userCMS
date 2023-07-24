@@ -26,7 +26,7 @@ const RegisterPage = () => {
     var data = JSON.stringify({
       query: `mutation CreateUser($name: String!, $password: String!, $email:String!, $phone:String!, $picture:String!, $company:String!){
             createUser(
-                input: {
+                data: {
                 name: $name
                 email: $email
                 password: $password

@@ -22,17 +22,8 @@ export class UserResolver {
     return this.userService.findById(id);
   }
   @Mutation(() => User)
-  async createUser(@Args('input') input: UserInput) {
-    const friends = input.friendIds
-      ? await this.usersRepository.findBy({
-          id: In(input.friendIds),
-        })
-      : [];
-    const user = this.usersRepository.create({
-      ...input,
-      friends,
-    });
-    return this.usersRepository.save(user);
+  async createUser(@Args('data') data: UserInput) {
+    return await this.userService.createUser(data);
   }
 
   @Mutation(() => User)
@@ -45,34 +36,6 @@ export class UserResolver {
 
   @Mutation(() => User)
   async addFriend(@Args('data') data: AddFriendInput): Promise<User | null> {
-    let user = await this.usersRepository.findOne({
-      where: {
-        id: data.userId,
-      },
-      relations: ['friends'],
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // get the friend from database
-    let friend = await this.usersRepository.findOne({
-      where: { id: data.friendId },
-    });
-    if (!friend) {
-      throw new Error('Friend not found');
-    }
-
-    // check if this friend already exists in user's friends list
-    if (user.friends.some((existingFriend) => existingFriend.id == friend.id)) {
-      throw new Error('This user is already a friend');
-    }
-
-    user.friends = [...user.friends, friend];
-    // // save updated user
-    user = await this.usersRepository.save(user);
-
-    return user;
+    return await this.userService.addFriend(data);
   }
 }
